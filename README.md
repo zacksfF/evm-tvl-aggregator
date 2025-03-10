@@ -1,2 +1,1 @@
-# Solana-Smart-Contracts
- Efficient smart contract built on the Solana blockchain
+a collevction of golang auditing and security 
