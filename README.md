@@ -64,7 +64,7 @@ EVM TVL Aggregator is a comprehensive solution for tracking and calculating Tota
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/evm-tvl-aggregator.git
+git clone https://github.com/zacksfF/evm-tvl-aggregator.git
 cd evm-tvl-aggregator
 
 # Install dependencies
