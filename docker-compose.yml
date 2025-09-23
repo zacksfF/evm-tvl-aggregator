@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: tvl-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tvl_aggregator
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tvl_aggregator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: tvl-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # API Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tvl-api
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/tvl_aggregator?sslmode=disable
+      - REDIS_URL=redis://redis:6379
+      - PORT=8080
+      - ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["./api"]
+
+  # Indexer Service
+  indexer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tvl-indexer
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/tvl_aggregator?sslmode=disable
+      - REDIS_URL=redis://redis:6379
+      - ENV=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["./indexer"]
+
+  # TUI Service
+  tui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tvl-tui
+    restart: "no"
+    environment:
+      - API_URL=http://api:8080
+      - ENV=production
+    depends_on:
+      - api
+    stdin_open: true
+    tty: true
+    command: ["./tui"]
+
+  # Database Admin Interface
+  adminer:
+    image: adminer:latest
+    container_name: tvl-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: tvl-network

@@ -1,0 +1,32 @@
+# TVL Aggregator Configuration
+api:
+  url: "http://localhost:8080"
+  timeout: "30s"
+  retry_attempts: 3
+  retry_delay: "1s"
+
+ui:
+  refresh_interval: "5s"
+  no_color: false
+  theme: "dark"
+  chart_height: 10
+  chart_width: 80
+  show_help: true
+
+log:
+  level: "info"
+  format: "text"
+  output: "stderr"
+
+chains:
+  ethereum:
+    name: "Ethereum"
+    rpc_url: "https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY"
+    native_token: "ETH"
+    
+protocols:
+  - name: "uniswap-v2"
+    type: "dex"
+    description: "Uniswap V2 DEX"
+    website: "https://uniswap.org"
+    enabled: true
