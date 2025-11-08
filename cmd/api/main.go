@@ -115,7 +115,7 @@ func main() {
 		}
 	}()
 
-	// Wait for interrupt signal
+	// wait for interrupt signal
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
@@ -130,5 +130,5 @@ func main() {
 		log.Fatal("Server forced to shutdown:", err)
 	}
 
-	fmt.Println("✅ Server stopped")
+	fmt.Println(" Server stopped")
 }
