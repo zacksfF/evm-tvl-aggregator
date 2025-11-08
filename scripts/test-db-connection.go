@@ -47,7 +47,7 @@ func main() {
 		log.Fatalf("Failed to ping database: %v", err)
 	}
 
-	fmt.Println("✅ Database connection successful!")
+	fmt.Println(" Database connection successful!")
 
 	// Test basic queries
 	var version string
@@ -56,7 +56,7 @@ func main() {
 		log.Fatalf("Failed to query database version: %v", err)
 	}
 
-	fmt.Printf("📊 PostgreSQL Version: %s\n", version)
+	fmt.Printf(" PostgreSQL Version: %s\n", version)
 
 	// Check if our tables exist
 	var tableCount int
@@ -69,7 +69,7 @@ func main() {
 		log.Fatalf("Failed to check tables: %v", err)
 	}
 
-	fmt.Printf("📋 Found %d main tables in database\n", tableCount)
+	fmt.Printf(" Found %d main tables in database\n", tableCount)
 
 	if tableCount > 0 {
 		// Count chains
@@ -83,13 +83,13 @@ func main() {
 		var protocolCount int
 		err = db.QueryRow("SELECT COUNT(*) FROM protocols").Scan(&protocolCount)
 		if err == nil {
-			fmt.Printf("🏛️  Protocols configured: %d\n", protocolCount)
+			fmt.Printf("  Protocols configured: %d\n", protocolCount)
 		}
 	} else {
-		fmt.Println("⚠️  No tables found. Run migrations to set up the schema.")
+		fmt.Println(" No tables found. Run migrations to set up the schema.")
 	}
 
-	fmt.Println("\n✅ Database test completed successfully!")
+	fmt.Println("\n Database test completed successfully!")
 }
 
 func getEnv(key, defaultValue string) string {
